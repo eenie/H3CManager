@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearTop">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1602027082"
+            android:id="@+id/textId"
+            android:textColor="#ffffff"
+            android:layout_marginTop="5dp"
+            android:singleLine="true"
+            android:background="#4b89f3"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="上海浦东发展银行"
+            android:id="@+id/textName"
+            android:textColor="#000000"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:paddingRight="10dp"
+
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:focusableInTouchMode="true"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="3-Normal"
+            android:id="@+id/textServerity"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="5dp"
+            android:singleLine="true"
+            android:background="@drawable/selector_statue"
+            android:textColor="#f5f5f5"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cn/trade/Superdome/hw"
+        android:id="@+id/textTitle"
+        android:layout_below="@+id/linearTop"
+        android:layout_marginTop="5dp"
+        android:textColor="#000000"
+        android:textSize="18sp"
+
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:focusableInTouchMode="true"
+        android:singleLine="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textTitle"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="HP Superdome sx2000 32 Skt Chassis"
+            android:id="@+id/textProductDes"
+            android:layout_below="@+id/textTitle"
+            android:layout_weight="1"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="center_vertical"
+            android:singleLine="true"
+
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusableInTouchMode="true"
+            android:paddingRight="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="0:2:43"
+            android:id="@+id/textAge"
+            android:layout_alignTop="@+id/textProductDes"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="5dp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+</RelativeLayout>

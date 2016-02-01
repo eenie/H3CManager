@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.orivon.mob.h3cmanager.CaseInfoListActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgSet"
+            android:src="@mipmap/ic_set"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgBack"
+            android:src="@mipmap/ic_back"
+            android:layout_centerVertical="true"
+            android:padding="10dp" />
+
+        <TextView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:text="56"
+            android:id="@+id/textNum"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imgBack"
+            android:textColor="#f5f5f5"
+            android:gravity="center"
+            android:background="@drawable/shape_circle"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="My Queue"
+            android:id="@+id/textView4"
+            android:layout_centerInParent="true"
+            android:textColor="#f5f5f5" />
+
+    </RelativeLayout>
+
+    <com.orivon.mob.library.view.SuperListView
+        android:id="@+id/caseInfoList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:focusable="true"
+        android:choiceMode="singleChoice"
+        android:layout_weight="1">
+    </com.orivon.mob.library.view.SuperListView>
+
+    <RelativeLayout
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:id="@+id/linear">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnPrev"
+                android:text="&lt;-"
+                android:background="@color/colorPrimary"
+                android:textColor="#f5f5f5"
+                android:textStyle="bold"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="1/10"
+                android:id="@+id/textCount"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:textColor="#f5f5f5"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="->"
+                android:id="@+id/btnNext"
+                android:background="@color/colorPrimary"
+                android:textColor="#f5f5f5"
+                android:textStyle="bold"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

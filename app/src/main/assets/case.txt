@@ -1,0 +1,710 @@
+HTTP/1.1 200 OK
+Date: Mon, 01 Feb 2016 02:15:14 GMT
+Server: Apache/2.2.27 (Unix) mod_ssl/2.2.27 OpenSSL/1.0.1g mod_jk/1.2.28
+X-Powered-By: JSP/2.1
+Cache-Control: no-store
+Pragrma: no-cache
+Expires: Thu, 01 Jan 1970 00:00:00 GMT
+Set-Cookie: JSESSIONID=a978244675562cdd0f17f15dcdfc.hpcms_s1; Path=/hpcms
+Content-Language: zh-CN
+Keep-Alive: timeout=30, max=1000
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+Content-Type: text/html;charset=UTF-8
+
+1ff8
+
+
+
+
+ 
+
+ 
+
+<script language="JavaScript" src="/hpcms/js/jquery.js"></script>
+<script language="JavaScript" src="/hpcms/js/common.js"></script>
+<script type="text/javascript" src="/hpcms/My97DatePicker/WdatePicker.js"></script>
+<link href="/hpcms/css/style.css" rel="stylesheet" type="text/css" />
+<link href="/hpcms/My97DatePicker/skin/WdatePicker.css" rel="stylesheet" type="text/css"/>
+
+<!-- Tooltip classes -->
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-yellow/tip-yellow.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-violet/tip-violet.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-darkgray/tip-darkgray.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-skyblue/tip-skyblue.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-yellowsimple/tip-yellowsimple.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-twitter/tip-twitter.css" type="text/css" />
+<link rel="stylesheet" href="/hpcms/poshytip-1.2/src/tip-green/tip-green.css" type="text/css" />
+<!-- jQuery and the Poshy Tip plugin files -->
+<script type="text/javascript" src="/hpcms/poshytip-1.2/src/jquery.poshytip.js"></script>
+
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<script type="text/javascript">
+
+</script>
+<div id="mask" class="mask"></div> 
+<div id="tipMsg" style="display: none;"></div>
+<div id="menu" style="display: none;">
+	<ul>
+		<li>
+			<a href="javascript:changeActionType('add')" >add</a>
+		</li>
+		<li>
+			<a href="javascript:changeActionType('edit')" >edit</a>
+		</li>
+		<li>
+			<a href="javascript:changeActionType('update')" >update</a>
+		</li>
+		<li>
+			<a href="javascript:changeActionType('')" >clear</a>
+		</li>
+	</ul>
+	<input id="operationId" type="hidden">
+</div>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Queue case list</title>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $(".click").click(function(){
+  $(".tip").fadeIn(200);
+  });
+  
+  $(".tiptop a").click(function(){
+  $(".tip").fadeOut(200);
+});
+
+  $(".sure").click(function(){
+  $(".tip").fadeOut(100);
+});
+
+  $(".cancel").click(function(){
+  $(".tip").fadeOut(100);
+});
+
+});
+
+function assign(){
+     var url="form.html"; //转向网页的地址;
+     var name="newwindow";                        //网页名称，可为空;
+     var iWidth=610;                          //弹出窗口的宽度;
+     var iHeight=600;                       //弹出窗口的高度;
+     //获得窗口的垂直位置
+     var iTop = (window.screen.availHeight-30-iHeight)/2;
+     //获得窗口的水平位置
+     var iLeft = (window.screen.availWidth-10-iWidth)/2;
+     var params='width='+iWidth
+                +',height='+iHeight
+                +',top='+iTop
+                +',left='+iLeft
+                +',channelmode=yes'//是否使用剧院模式显示窗口。默认为 no
+                +',directories=yes'//是否添加目录按钮。默认为 yes
+                +',fullscreen=no' //是否使用全屏模式显示浏览器
+                +',location=no'//是否显示地址字段。默认是 yes
+                +',menubar=no'//是否显示菜单栏。默认是 yes
+                +',resizable=no'//窗口是否可调节尺寸。默认是 yes
+                +',scrollbars=yes'//是否显示滚动条。默认是 yes
+                +',status=yes'//是否添加状态栏。默认是 yes
+                +',titlebar=yes'//默认是 yes
+                +',toolbar=no'//默认是 yes
+                ;
+   window.open(url, name,params); 
+ }
+
+ function newGongdan(){
+ 	window.location = "/hpcms/case/add";
+ }
+ 
+ function selectAllChk(obj){ 
+ 	 if(obj.checked){
+ 	 	$("[name='queueIds']").attr("checked",'true');
+ 	 }else{
+ 	 	$("[name='queueIds']").removeAttr("checked");
+ 	 }
+ }
+ setInterval("doSubmit()",60000);
+</script>
+
+
+</head>
+
+
+<body>
+
+	<div class="place">
+    <span>Locaton：</span>
+			<ul class="placeul">
+				<li>
+					Index
+				</li>
+				<li>
+					Case
+				</li>
+				<li>
+					My Queues
+				</li>
+			</ul>
+    </div>
+     <form action="/hpcms/case/queueCaseList" id="pageForm" class="formbody">
+     	<div class="formtitle">
+			<span>My Queue</span>
+		 </div>
+		 <input id="column" name="column" type="hidden"/>
+		 <input id="sort" name="sort" type="hidden"/>
+		 <table  class="filetable">
+    <!-- 
+    		<tr>
+    			<td>Case ID</td>
+    			<td>
+    			  <input class="dfinput" name="numberId" value=""/> 
+    			</td>
+    			<td>Company</td>
+    			<td>
+    			  <input class="dfinput" name="companyName" value=""/> 
+    			</td>
+    			<td>name</td>
+    			<td>
+    			  <input class="dfinput" name="name" value=""/> 
+    			</td>  
+    		</tr> 
+    		<tr>
+    			<td>SN</td>
+    			<td >
+    			  <input class="dfinput" name="sn" value=""/> 
+    			</td>
+    			<td>Phone</td>
+    			<td>
+    			 	 <input class="dfinput" name="phone1" value="" />
+    			</td> 
+    			<td></td>
+    			<td></td>
+    		</tr> 
+    		-->
+    		<tr>
+    			<td style="width:8%">My Queue(10)</td>
+    			<td > 
+					<ul class="queues" >
+    					
+    						
+    							
+    								
+    									<li><input type="checkbox"  name="selectAllCheckBox"  checked="checked"  onclick="selectAllChk(this);"/>All</li>
+    								
+    								
+    							
+    						
+    						
+    					
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="a552af6e5c214996970713b448dd3cb4" /> CNA_Alpha_CN(0)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="c368478d38ac4e5aafb709bcc3ea87b1" /> CNA_SC_ISEE(0)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="3286d93e2e1a43b68e135c7a1aff3ceb" /> CNA_SC CISCO(0)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="911e08605d564655bf2b69e7af3db71b" /> CNA_SC TRADE(1)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="d0645ed9b1424a3cbb73286b6d2b4296" /> CNA_SC(4)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="94571150ce1041d09ebd76923c9f8ee2" /> CNI_SC X86 MVServer(0)</li>
+								
+								 
+							 
+						 
+							
+								
+									<li><input name="queueIds" checked="checked" type="checkbox" value="61a51ccd069348d3b653bb319c103960" /> CNA_SC HA(5)</li>
+								
+								 
+							 
+						
+					</ul>
+					</td>  
+					
+    		</tr>
+    		
+    		</table>
+     </form>
+		<div class="rightinfo"> 
+			<table class="filetable" style="width: 98%">
+				<tr>
+					<td>
+						<input type="button" onclick="doSubmit()" value="Search"   class="btnQuery" style="float:right;margin-bottom: 10px;"/>
+					</td>
+				</tr>
+			</table>
+			<table class="tablelist">
+				<thead>
+					<tr>
+						<th width="10%"> 
+							<a id="NUMBER_ID" style="cursor: pointer;" href="javascript:sort('NUMBER_ID','DESC')">Case ID</a>
+						</th>
+						<th width="15%"> 
+							<a id="COMPANY_NAME" style="cursor: pointer;" href="javascript:sort('COMPANY_NAME','DESC')">Company</a>
+						</th>
+						<th width="15%">
+							<a id="TITLE" style="cursor: pointer;" href="javascript:sort('TITLE','DESC')">Title</a>
+						</th>
+						<th width="20%">
+							<a id="DESCRIPTION" href="javascript:sort('DESCRIPTION','DESC')">Product Description</a>
+						</th>
+						<th width="8%">
+							<a id="SLA" style="cursor: pointer;" href="javascript:sort('SLA','DESC')">SLA</a>
+						</th>
+						<th
+2000
+ width="15%">
+							<a id="QUEUE_ID" style="cursor: pointer;" href="javascript:sort('SLA','DESC')">Queue</a>
+						</th>
+						<th width="10%">
+							<a id="Severity" style="cursor: pointer;" href="javascript:sort('Severity','DESC')">Severity</a>
+						</th>
+						<th width="10%">
+							<a id="Province" style="cursor: pointer;" href="javascript:sort('Province','DESC')">Province</a>
+						</th>
+						<th width="5%">
+							<a id="SEND_QUEUE_DATE" href="javascript:sort('SEND_QUEUE_DATE','DESC')">Age</a>(DD:HH:MM)
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=2b40adb5ffdf41749f3ea382357696aa&type=My Queues">1602026661</a>
+							</td>
+							<td>
+								上汽依维柯红岩商用车有限公司
+							</td>
+							<td>
+								[ce assist]cn/4hr/3PAR/hw
+							</td>
+							<td> 
+								HP 3PAR StoreServ 7400 2-N Storage Base 
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								重庆市
+							</td>
+							 <td>
+								0:0:0
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=00b124817a12439593dabc38702f9a35&type=My Queues">1602026665</a>
+							</td>
+							<td>
+								辽宁省大连商品交易所
+							</td>
+							<td>
+								[dcc]cn/nbd/EVA8400/hw
+							</td>
+							<td> 
+								HP EVA8400 22GB Cache Multi Product Rack 
+							</td>
+							<td>
+								NBD
+							</td>
+							<td>
+								CNA_SC HA
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								辽宁省
+							</td>
+							 <td>
+								0:0:0
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=6c096cc67d49478d8fdece036d5e273f&type=My Queues">1602026654</a>
+							</td>
+							<td>
+								CPIC
+							</td>
+							<td>
+								[FLOW2]DCC/4HR/7Hol/3PAR/V800:QR637A:SGH2407672:600fa::Alert 379: PD 398 Failed (invali
+							</td>
+							<td> 
+								HP P10000 3PAR V800 IEC Base
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								上海市
+							</td>
+							 <td>
+								0:0:2
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=13177168d3a3423688ae8123ce348caf&type=My Queues">1602026656</a>
+							</td>
+							<td>
+								辽宁省大连商品交易所
+							</td>
+							<td>
+								[dcc]cn/4hr/EVA8100/hw
+							</td>
+							<td> 
+								HP EVA8100 2C6D Array 
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								辽宁省
+							</td>
+							 <td>
+								0:0:2
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=29c6ddf89c5f4b329fac9d38c9fb0f46&type=My Queues">1602026650</a>
+							</td>
+							<td>
+								辽宁省大连商品交易所
+							</td>
+							<td>
+								[dcc]cn/4hr/EVA8100/hw
+							</td>
+							<td> 
+								HP EVA8100 2C6D Array 
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								辽宁省
+							</td>
+							 <td>
+								0:0:3
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=aa019a5c5bb44400933f668b5918d9dd&type=My Queues">1602026635</a>
+							</td>
+							<td>
+								中国移动通信集团河南有限公司
+							</td>
+							<td>
+								[dcc]cn/4hr/ XP24000 /hw
+							</td>
+							<td> 
+								 HP XP24000 DKC Disk Control Frame  
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC HA
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								河南省
+							</td>
+							 <td>
+								0:0:5
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=d2da54a26bdd4c55b71824ff0fc8955f&type=My Queues">1601026161</a>
+							</td>
+							<td>
+								China Mobile Communication Corp Inner Mongolia Co., Ltd..109610-Hohhot City,The
+							</td>
+							<td>
+								[flow2]Alert 64: 360002|SYSTEM? System write cache availability is degraded. (Event Cou
+							</td>
+							<td> 
+								HP 3PAR StoreServ 10800 Rack Config Base
+							</td>
+							<td>
+								NCD
+							</td>
+							<td>
+								CNA_SC HA
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								内蒙古自治区
+							</td>
+							 <td>
+								0:11:48
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=929d96955c6b4f7ea398ef92f7ab3ab8&type=My Queues">1601025494</a>
+							</td>
+							<td>
+								中国移动重庆有限公司
+							</td>
+							<td>
+								cn/trade/superdome/hw
+							</td>
+							<td> 
+								HP Superdome sx2000 16 Skt Chassis
+							</td>
+							<td>
+								7*24*4
+							</td>
+							<td>
+								CNA_SC HA
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								重庆市
+							</td>
+							 <td>
+								2:18:43
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=1c9799a23e5844959592e5ba2d19ff1c&type=My Queues">1601025106</a>
+							</td>
+							<td>
+								内蒙古证联信息技术有限责任公司
+							</td>
+							<td>
+								cn/trade/D2D4112/hw
+							</td>
+							<td> 
+								HP D2D4112 Backup System
+							</td>
+							<td>
+								Trade
+							</td>
+							<td>
+								CNA_SC TRADE
+							</td>
+							<td>
+								2-Critical-Degraded
+							</td>
+							<td>
+								内蒙古自治区
+							</td>
+							 <td>
+								2:22:41
+							</td>
+						</tr>
+						
+					
+						<tr>
+							<td>
+								<a href="/hpcms/case/edit?id=ab5b3d1126d54f049c068523f7197847&type=My Queues">1601001786</a>
+							</td>
+							<td>
+								160105-company
+							</td>
+							<td>
+								3124
+							</td>
+							<td> 
+								3243
+							</td>
+							<td>
+								6H CTR
+							</td>
+							<td>
+								CNA_SC HA
+							</td>
+							<td>
+								3-Normal
+							</td>
+							<td>
+								北京市
+							</td>
+							 <td>
+								24:18:32
+							</td>
+						</tr>
+						
+					
+				</tbody>
+			</table>
+
+			
+<script type="text/javascript">
+	function jumpPage(){
+		var num = $("#jumpPage").val();
+		var total =  1;
+		if(num != ""){
+			var n = parseInt(num);
+			if(n > 0 && n <= total){
+				jump(n);
+			}
+		}
+	}
+</script>
+
+	
+		
+			
+			
+			
+				
+			
+		
+		
+	
+	<div class="pagin">
+		
+			
+				<div class="message">
+					Total of <i class="blue">10</i> records，
+					Current display &nbsp; <i class="blue">1&nbsp;</i> pages，total&nbsp; <i class="blue">1&nbsp;</i>pages
+				</div>
+			
+			<ul class="paginList">
+				<li class="paginItem">
+					<a href="javascript:jump(0);"><span class="pagepre" style="display: block;"></span>
+					</a>
+				</li>
+				
+					<li class="paginItem  current">
+						<a href="javascript:jump(1);">1 </a>
+					</li>
+				
+				<li class="paginItem">
+					<a ><span class="pagenxt" style="display: block;"></span></a>
+					<ul style="float: left;">
+						<li style="float: left;">
+							<input id="jumpPage" type="text" class="jumpInput" value="">
+						</li>
+						<li style="float: left;">
+							<a style="float: left;" href="javascript:jumpPage();">GO</a>
+		<!--							<input type="button" class="btn" value="Jump" onclick="jumpPage();">-->
+						</li>
+					</ul>
+				</li>
+			</ul>
+		
+	</div>
+
+
+			<div class="tip">
+				<div class="tiptop">
+					<span>Message</span><a></a>
+				</div>
+
+				<div class="tipinfo">
+					<span><img src="../images/ticon.png" />
+					</span>
+					<div class="tipright">
+						<p> 
+							Whether to confirm the modificatio
+17e
+n to the information?
+						</p>
+						<cite>If it is please click the OK button, otherwise please click Cancel</cite>
+					</div>
+				</div>
+
+				<div class="tipbtn">
+					<input name="" type="button" class="sure" value="OK" />
+					&nbsp;
+					<input name="" type="button" class="cancel" value="Cancel" />
+				</div>
+
+			</div>
+
+
+
+
+		</div> 
+</body>
+</html>
+
+
+0
+
