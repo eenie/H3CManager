@@ -7,7 +7,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 
-import org.xutils.x;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

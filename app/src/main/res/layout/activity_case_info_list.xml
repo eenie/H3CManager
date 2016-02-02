@@ -26,19 +26,20 @@
             android:id="@+id/imgBack"
             android:src="@mipmap/ic_back"
             android:layout_centerVertical="true"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:visibility="gone"/>
 
         <TextView
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:text="56"
             android:id="@+id/textNum"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/imgBack"
             android:textColor="#f5f5f5"
             android:gravity="center"
             android:background="@drawable/shape_circle"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:layout_marginLeft="10dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -87,7 +88,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="1/10"
                 android:id="@+id/textCount"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"

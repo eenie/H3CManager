@@ -7,15 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.orivon.mob.h3cmanager.bean.MyQueuesBean;
+import com.orivon.mob.h3cmanager.bean.Parent;
+import com.orivon.mob.h3cmanager.bean.ParentBean;
 import com.orivon.mob.h3cmanager.callback.DataCallBack;
 import com.orivon.mob.library.view.SuperListView;
 import com.squareup.okhttp.Headers;
@@ -24,6 +24,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,11 +48,10 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
     TextView textCount, textNum;
     Button btnPrev, btnNext;
 
-    String h3cCookie;
-
+    H3CApplication application;
     String caseURL = "http://newcms.h3c.com/hpcms/case/queueCaseList?column=&sort=&selectAllCheckBox=on&queueIds=a552af6e5c214996970713b448dd3cb4&queueIds=c368478d38ac4e5aafb709bcc3ea87b1&queueIds=3286d93e2e1a43b68e135c7a1aff3ceb&queueIds=911e08605d564655bf2b69e7af3db71b&queueIds=d0645ed9b1424a3cbb73286b6d2b4296&queueIds=94571150ce1041d09ebd76923c9f8ee2&queueIds=61a51ccd069348d3b653bb319c103960";
 
-
+    String h3cCookie;
     HttpConnect http = new HttpConnect();
 
     @Override
@@ -58,9 +59,12 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_case_info_list);
         caseAdapter = new CaseAdapter();
-        h3cCookie = getIntent().getStringExtra("h3cCookie");
-
-//        queuesBeans = parseHtml(getCaseHtml());
+        application = (H3CApplication) getApplication();
+        h3cCookie = application.getH3cCookie();
+        if (h3cCookie.isEmpty()) {
+            Toast.makeText(this, "参数错误", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
 
 
@@ -74,6 +78,14 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         }, 1000);
 
 
+        Parent parent = new Parent();
+
+        parent.setEmail("");
+        try {
+            application.getDbManager().save(parent);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -280,8 +292,12 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
                     .setAge(infos.get(8).text())
                     .setUrl("");
             MyQueuesBean myQueuesBean = builder.create();
+
+
             myQueuesBeans.add(myQueuesBean);
         }
+
+
         return myQueuesBeans;
     }
 

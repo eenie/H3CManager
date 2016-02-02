@@ -1,13 +1,17 @@
 package com.orivon.mob.h3cmanager;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Xml;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,13 +28,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.xutils.x;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,18 +51,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final String Referer = "http://newcms.h3c.com/hpcms/login.jsp";
 
     SharedPreferences sp;
+    NotificationManager nm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        sp = getSharedPreferences();
+        sp = getSharedPreferences("cache", 0);
 
         initView();
         httpConnect = new HttpConnect();
 
         loadKapt();
+
+         nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
     }
 
     private void initView() {
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnLogin:
 
+
                 login();
 
                 break;
@@ -96,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
         }
+
+
+
+
+
+
 
     }
 
@@ -220,6 +232,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (response.header("Content-Length").equals("172")) {
                             Intent caseIntent = new Intent(MainActivity.this, CaseInfoListActivity.class);
                             caseIntent.putExtra("h3cCookie", h3cCookie);
+
+
+
+
                             startActivity(caseIntent);
                             finish();
                         } else {
@@ -238,6 +254,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
 
 
+    }
+
+
+
+    public void showNotice(int noticeID,String title,String content) {
+        //此Builder为android.support.v4.app.NotificationCompat.Builder中的，下同。
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        //系统收到通知时，状态栏栏上面显示的文字。
+        mBuilder.setTicker("你有新的消息！！！");
+        //显示在通知栏上的小图标
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        //通知标题
+        mBuilder.setContentTitle(title);
+        //通知内容
+        mBuilder.setContentText(content);
+
+        //设置大图标，即通知条上左侧的图片（如果只设置了小图标，则此处会显示小图标）
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+        //显示在小图标左侧的数字
+
+        //设置为不可清除模式
+        mBuilder.setOngoing(true);
+
+        mBuilder.setAutoCancel(true);
+
+        //点击通知之后需要跳转的页面
+        Intent resultIntent = new Intent(this, CaseInfoListActivity.class);
+
+        //使用TaskStackBuilder为“通知页面”设置返回关系
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        //为点击通知后打开的页面设定 返回 页面。（在manifest中指定）
+        stackBuilder.addParentStack(CaseInfoListActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+
+        PendingIntent pIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pIntent);
+
+        //显示通知，id必须不重复，否则新的通知会覆盖旧的通知（利用这一特性，可以对通知进行更新）
+        nm.notify(noticeID, mBuilder.build());
     }
 
 

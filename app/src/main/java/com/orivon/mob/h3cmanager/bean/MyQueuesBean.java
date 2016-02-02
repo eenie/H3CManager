@@ -5,7 +5,7 @@ package com.orivon.mob.h3cmanager.bean;
  * Case队列
  */
 public class MyQueuesBean {
-    private int ID = 0;
+    private int id = 0;
     private String Company = "";
     private String Title = "";
     private String ProductDes = "";
@@ -21,7 +21,7 @@ public class MyQueuesBean {
 
 
     public MyQueuesBean(Builder builder) {
-        this.ID = builder.ID;
+        this.id = builder.ID;
         this.Company = builder.Company;
         this.Title = builder.Title;
         this.ProductDes = builder.ProductDes;
@@ -118,7 +118,7 @@ public class MyQueuesBean {
 
 
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getCompany() {
