@@ -1,5 +1,9 @@
 package com.orivon.mob.h3cmanager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,8 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.orivon.mob.h3cmanager.bean.MyQueuesBean;
-import com.orivon.mob.h3cmanager.bean.Parent;
-import com.orivon.mob.h3cmanager.bean.ParentBean;
 import com.orivon.mob.h3cmanager.callback.DataCallBack;
 import com.orivon.mob.library.view.SuperListView;
 import com.squareup.okhttp.Headers;
@@ -24,23 +26,18 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.xutils.ex.DbException;
-import org.xutils.x;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CaseInfoListActivity extends AppCompatActivity implements View.OnClickListener {
 
     SuperListView caseInfoList;
     List<MyQueuesBean> queuesBeans=new ArrayList<>();
 
-    Map<Integer, Integer> queuesBeanMap = new HashMap<>();
 
     CaseAdapter caseAdapter;
 
@@ -53,6 +50,16 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 
     String h3cCookie;
     HttpConnect http = new HttpConnect();
+
+
+    BroadcastReceiver caseReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            caseInfoList.startRefresh();
+        }
+    };
+
+    IntentFilter intentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,16 +85,19 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         }, 1000);
 
 
-        Parent parent = new Parent();
+        startService(new Intent(CaseInfoListActivity.this, CaseService.class));
 
-        parent.setEmail("");
-        try {
-            application.getDbManager().save(parent);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("new case");
+        registerReceiver(caseReceiver, intentFilter);
+
+    }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(caseReceiver);
     }
 
     private void initView() {
@@ -115,7 +125,10 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         caseInfoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                queuesBeanMap.put(queuesBeans.get(position-1).getID(), queuesBeans.get(position-1).getID());
+                MyQueuesBean myQueuesBean = queuesBeans.get(position - 1);
+                myQueuesBean.setIsNew(false);
+                application.setOld(myQueuesBean);
+                caseAdapter.notifyDataSetChanged();
 
             }
         });
@@ -217,11 +230,11 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
             }
 
 
-            if (queuesBeanMap.containsKey(queuesBeans.get(position).getID())) {
-
-                convertView.setBackgroundColor(Color.parseColor("#f5f5f5"));
-            } else {
+            if (application.isNew(queuesBeans.get(position))) {
                 convertView.setBackgroundColor(Color.parseColor("#fdcd44"));
+
+            } else {
+                convertView.setBackgroundColor(Color.parseColor("#f5f5f5"));
             }
 
 
@@ -231,9 +244,7 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 
 
         public class ViewHolder {
-
             TextView textId, textName, textServerity, textTitle, textProductDes, textAge;
-
         }
 
 
@@ -269,18 +280,11 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         Elements comElements = element.getElementsByTag("tr");
         List<MyQueuesBean> myQueuesBeans = new ArrayList<>();
         MyQueuesBean.Builder builder = new MyQueuesBean.Builder();
-
-
         Elements countElements = document.getElementsByClass("blue");
-
         builder.setRecordCount(countElements.get(0).text().trim());
         builder.setPagerCount(countElements.get(2).text().trim());
-
-
         for (int i = 0; i < comElements.size(); i++) {
             Elements infos = comElements.get(i).getElementsByTag("td");
-
-
             builder.setID(Integer.parseInt(infos.get(0).text()))
                     .setCompany(infos.get(1).text())
                     .setTitle(infos.get(2).text())
@@ -292,12 +296,9 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
                     .setAge(infos.get(8).text())
                     .setUrl("");
             MyQueuesBean myQueuesBean = builder.create();
-
-
+//            application.save(myQueuesBean);
             myQueuesBeans.add(myQueuesBean);
         }
-
-
         return myQueuesBeans;
     }
 
@@ -342,5 +343,9 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CaseService.stopNotice();
+    }
 }

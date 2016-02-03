@@ -1,27 +1,53 @@
 package com.orivon.mob.h3cmanager.bean;
 
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
+
 /**
  * Created by Eenie on 2016/2/1.
  * Case队列
  */
+
+@Table(name = "myqueuesbean" ,onCreated = "CREATE UNIQUE INDEX index_name ON myqueuesbean(caseID)")
 public class MyQueuesBean {
+
+    @Column(name = "id", isId = true, autoGen = true)
     private int id = 0;
+
+    @Column(name = "caseID")
+    private int caseID;
+    @Column(name = "Company")
     private String Company = "";
+    @Column(name = "Title")
     private String Title = "";
+    @Column(name = "ProductDes")
     private String ProductDes = "";
+    @Column(name = "SLA")
     private String SLA = "";
+    @Column(name = "Queue")
     private String Queue = "";
+    @Column(name = "Severity")
     private String Severity = "";
+    @Column(name = "Province")
     private String Province = "";
+    @Column(name = "Age")
     private String Age = "";
+    @Column(name = "url")
     private String url = "";
+    @Column(name = "RecordCount")
     private String RecordCount = "";
+    @Column(name = "PagerCount")
     private String PagerCount = "";
+    @Column(name = "isNew")
+    private boolean isNew = true;
 
 
+    public MyQueuesBean() {
+
+    }
 
     public MyQueuesBean(Builder builder) {
-        this.id = builder.ID;
+        this.caseID = builder.ID;
         this.Company = builder.Company;
         this.Title = builder.Title;
         this.ProductDes = builder.ProductDes;
@@ -33,6 +59,7 @@ public class MyQueuesBean {
         this.url = builder.url;
         this.RecordCount = builder.RecordCount;
         this.PagerCount = builder.PagerCount;
+        this.isNew = builder.isNew;
     }
 
 
@@ -50,6 +77,7 @@ public class MyQueuesBean {
         private String url = "";
         private String RecordCount = "";
         private String PagerCount = "";
+        private boolean isNew = true;
 
 
 
@@ -114,11 +142,15 @@ public class MyQueuesBean {
         public void setPagerCount(String pagerCount) {
             PagerCount = pagerCount;
         }
+
+        public void setIsNew(boolean isNew) {
+            this.isNew = isNew;
+        }
     }
 
 
     public int getID() {
-        return id;
+        return caseID;
     }
 
     public String getCompany() {
@@ -163,5 +195,13 @@ public class MyQueuesBean {
 
     public String getPagerCount() {
         return PagerCount;
+    }
+
+    public boolean getIsNew() {
+        return isNew;
+    }
+
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 }
