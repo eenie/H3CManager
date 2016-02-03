@@ -148,6 +148,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                         if (response.header("Content-Length").equals("172")) {
                             spTool.setString("h3cCookie", application.getH3cCookie());
+                            application.writeCookie(application.getH3cCookie());
                             Intent intent = new Intent(LoginActivity.this, CaseInfoListActivity.class);
                             startActivity(intent);
                             finish();

@@ -30,7 +30,7 @@ import java.util.Map;
 public class CaseService extends Service {
 
     Context mContext;
-    static Vibrator vibrator;
+
 
     final String assCaseURL = "http://newcms.h3c.com/hpcms/case/caseList?type=Assigned%20Cases";
 
@@ -62,7 +62,7 @@ public class CaseService extends Service {
     @Override
     public void onCreate() {
 
-        System.out.println("service");
+        System.out.println("service start");
 
         application = (H3CApplication) getApplication();
         http = application.getHttp();
@@ -70,11 +70,10 @@ public class CaseService extends Service {
         caseRunnable = new CaseRunnable();
         builder = new Headers.Builder();
         mContext = getApplicationContext();
-        vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
 
-        builder.add("Cookie", application.getH3cCookie());
-        handler.post(caseRunnable);
 
+        builder.add("Cookie", application.readCookie());
+        handler.postDelayed(caseRunnable, 10000);
         intent = new Intent();
         intent.setAction("com.asscase");
 
@@ -89,7 +88,7 @@ public class CaseService extends Service {
 
 
             try {
-                http.doGet(caseURL+HttpConnect.mapTooString(parse), builder.build(),
+                http.doGet(caseURL + HttpConnect.mapTooString(parse), builder.build(),
                         new DataCallBack() {
                             @Override
                             public void onStart() {
@@ -104,8 +103,20 @@ public class CaseService extends Service {
 
                             @Override
                             public void onSuccessful(String response) {
-                                parseHtml(response);
-                                handler.postDelayed(caseRunnable, time);
+
+
+                                try {
+                                    parseHtml(response);
+                                    handler.postDelayed(caseRunnable, time);
+
+                                } catch (IndexOutOfBoundsException e) {
+                                    application.removeCppkie();
+                                    application.showNotice(1001, "登录信息过期", "单击重新登录", LoginActivity.class);
+                                    application.startNotice();
+                                    CaseService.this.stopSelf();
+                                }
+
+
                             }
 
                             @Override
@@ -123,26 +134,15 @@ public class CaseService extends Service {
     }
 
 
-    public static void startNotice() {
-        try {
-            long[] pattern = {800, 1500, 800, 1500};
-            vibrator.vibrate(pattern, 2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    public static void stopNotice() {
-        try {
-            vibrator.cancel();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    public List<MyQueuesBean> parseHtml(String content) {
+    public List<MyQueuesBean> parseHtml(String content) throws IndexOutOfBoundsException {
         Document document = Jsoup.parse(content);
         Elements bodyElements = document.getElementsByTag("tbody");
+        if (bodyElements.size() < 2) {
+            throw new IndexOutOfBoundsException("cookie invide");
+        }
+
         Element element = bodyElements.get(2);
         Elements comElements = element.getElementsByTag("tr");
         List<MyQueuesBean> myQueuesBeans = new ArrayList<>();
@@ -169,8 +169,8 @@ public class CaseService extends Service {
                 public void onSuccess() {
 
                     System.out.println("save success");
-                    startNotice();
-                    application.showNotice(1000, "new message!!!", "Total of " + myQueuesBean.getRecordCount() + " records,total  " + myQueuesBean.getPagerCount() + " pages");
+                    application.startNotice();
+                    application.showNotice(1000, "new message!!!", "Total of " + myQueuesBean.getRecordCount() + " records,total  " + myQueuesBean.getPagerCount() + " pages", CaseInfoListActivity.class);
                     Intent caseIntent = new Intent();
                     caseIntent.setAction("new case");
                     sendBroadcast(caseIntent);
@@ -179,13 +179,12 @@ public class CaseService extends Service {
 
                 @Override
                 public void onFailure() {
-                    System.out.println("save not success");
+
 
                 }
             });
             myQueuesBeans.add(myQueuesBean);
         }
-
 
 
         Elements e = document.getElementsByClass("queues");

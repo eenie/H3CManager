@@ -74,10 +74,11 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_case_info_list);
         caseAdapter = new CaseAdapter();
         application = (H3CApplication) getApplication();
-        h3cCookie = application.getH3cCookie();
+        h3cCookie = application.readCookie();
         if (h3cCookie.isEmpty()) {
             Toast.makeText(this, "参数错误", Toast.LENGTH_SHORT).show();
-            return;
+            startActivity(new Intent(CaseInfoListActivity.this, LoginActivity.class));
+            finish();
         }
 
 
@@ -93,7 +94,6 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 
 
         startService(new Intent(CaseInfoListActivity.this, CaseService.class));
-
         intentFilter = new IntentFilter();
         intentFilter.addAction("new case");
         registerReceiver(caseReceiver, intentFilter);
@@ -280,9 +280,12 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    public List<MyQueuesBean> parseHtml(String content) {
+    public List<MyQueuesBean> parseHtml(String content) throws IndexOutOfBoundsException{
         Document document = Jsoup.parse(content);
         Elements bodyElements = document.getElementsByTag("tbody");
+        if (bodyElements.size() < 2) {
+            throw new  IndexOutOfBoundsException("cookie invide") ;
+        }
         Element element = bodyElements.get(2);
         Elements comElements = element.getElementsByTag("tr");
         List<MyQueuesBean> myQueuesBeans = new ArrayList<>();
@@ -325,9 +328,6 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         builder.add("Cookie", Cookie);
 
         try {
-
-            System.out.println(url+HttpConnect.mapTooString(parse));
-
             http.doGet(url+HttpConnect.mapTooString(parse), builder.build(), new DataCallBack() {
                 @Override
                 public void onStart() {
@@ -342,16 +342,22 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
                 @Override
                 public void onSuccessful(String response) {
 
-
-                    queuesBeans = parseHtml(response);
-
-
-                    if (queuesBeans.size() > 0) {
-                        textNum.setText(queuesBeans.get(0).getRecordCount());
-                        textCount.setText("1/" + queuesBeans.get(0).getPagerCount());
-                    }
                     caseInfoList.refreshCompleted();
-                    caseAdapter.notifyDataSetChanged();
+                    try {
+                        queuesBeans = parseHtml(response);
+                        if (queuesBeans.size() > 0) {
+                            textNum.setText(queuesBeans.get(0).getRecordCount());
+                            textCount.setText("1/" + queuesBeans.get(0).getPagerCount());
+                        }
+                        caseAdapter.notifyDataSetChanged();
+                    } catch (IndexOutOfBoundsException e) {
+                        application.removeCppkie();
+                        application.showNotice(1001, "登录信息过期", "单击重新登录", LoginActivity.class);
+                        finish();
+                    }
+
+
+
 
                 }
 
@@ -370,7 +376,7 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-        CaseService.stopNotice();
+        application.stopNotice();
     }
 
 
@@ -380,7 +386,7 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("筛选")
-                .setMultiChoiceItems(mapToStringArry(parse),null, null);
+                .setMultiChoiceItems(mapToStringArry(parse), null, null);
 
         builder.create().show();
     }

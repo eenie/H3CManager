@@ -15,15 +15,15 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         application = (H3CApplication) getApplication();
-
+        application.stopNotice();
 
         textWel = (TextView) findViewById(R.id.textWel);
         textWel.postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                if (application.getH3cCookie().isEmpty()) {
 
+                if (application.readCookie().isEmpty()) {
                     startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                     finish();
                 } else {

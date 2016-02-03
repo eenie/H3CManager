@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -34,6 +35,8 @@ public class H3CApplication extends Application {
     private DbManager dbManager;
     NotificationManager nm;
 
+    Vibrator vibrator;
+
 
     @Override
     public void onCreate() {
@@ -41,10 +44,10 @@ public class H3CApplication extends Application {
         Logger.init("Exam");
         http = new HttpConnect();
         spTool = new SPTool(this);
-        setH3cCookie(readCookie("h3cCookie"));
+        setH3cCookie(readCookie());
         x.Ext.init(this);
         initDB();
-
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
@@ -66,8 +69,8 @@ public class H3CApplication extends Application {
         spTool.setString("h3cCookie", h3cCookie);
     }
 
-    public String readCookie(String key) {
-        return spTool.getString(key);
+    public String readCookie() {
+        return spTool.getString("h3cCookie");
     }
 
     public void removeCppkie() {
@@ -78,8 +81,7 @@ public class H3CApplication extends Application {
     public void initDB() {
         DbManager.DaoConfig daoConfig = new DbManager.DaoConfig()
                 .setDbName("h3c.db")
-                .setDbVersion(2)
-                ;
+                .setDbVersion(2);
         dbManager = x.getDb(daoConfig);
     }
 
@@ -89,7 +91,7 @@ public class H3CApplication extends Application {
     }
 
 
-    public void save(Object object,AddListener listener) {
+    public void save(Object object, AddListener listener) {
         try {
             dbManager.save(object);
             listener.onSuccess();
@@ -97,6 +99,7 @@ public class H3CApplication extends Application {
             listener.onFailure();
         }
     }
+
     public void save(Object object) {
         try {
             dbManager.save(object);
@@ -108,8 +111,8 @@ public class H3CApplication extends Application {
 
     public MyQueuesBean isExist(MyQueuesBean queuesBean) {
         try {
-            MyQueuesBean queues= dbManager.selector(MyQueuesBean.class).where("caseID", "=", queuesBean.getID()).findFirst();
-            if (queues!=null) {
+            MyQueuesBean queues = dbManager.selector(MyQueuesBean.class).where("caseID", "=", queuesBean.getID()).findFirst();
+            if (queues != null) {
                 return queues;
             } else {
                 return null;
@@ -142,17 +145,17 @@ public class H3CApplication extends Application {
     }
 
 
-public void setOld(MyQueuesBean queuesBean) {
-    MyQueuesBean Bean=isExist(queuesBean);
-    Bean.setIsNew(false);
-    if (Bean != null) {
-        try {
-            dbManager.update(Bean, "isNew");
-        } catch (DbException e) {
-            e.printStackTrace();
+    public void setOld(MyQueuesBean queuesBean) {
+        MyQueuesBean Bean = isExist(queuesBean);
+        Bean.setIsNew(false);
+        if (Bean != null) {
+            try {
+                dbManager.update(Bean, "isNew");
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
 
     public interface AddListener {
@@ -163,7 +166,7 @@ public void setOld(MyQueuesBean queuesBean) {
     }
 
 
-    public void showNotice(int noticeID,String title,String content) {
+    public void showNotice(int noticeID, String title, String content, Class cls) {
         //此Builder为android.support.v4.app.NotificationCompat.Builder中的，下同。
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         //系统收到通知时，状态栏栏上面显示的文字。
@@ -186,12 +189,12 @@ public void setOld(MyQueuesBean queuesBean) {
         mBuilder.setVibrate(pattern);
 
         //点击通知之后需要跳转的页面
-        Intent resultIntent = new Intent(this, CaseInfoListActivity.class);
+        Intent resultIntent = new Intent(this, cls);
 
         //使用TaskStackBuilder为“通知页面”设置返回关系
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         //为点击通知后打开的页面设定 返回 页面。（在manifest中指定）
-        stackBuilder.addParentStack(CaseInfoListActivity.class);
+        stackBuilder.addParentStack(cls);
         stackBuilder.addNextIntent(resultIntent);
 
         PendingIntent pIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -200,4 +203,27 @@ public void setOld(MyQueuesBean queuesBean) {
         //显示通知，id必须不重复，否则新的通知会覆盖旧的通知（利用这一特性，可以对通知进行更新）
         nm.notify(noticeID, mBuilder.build());
     }
+
+
+
+    public  void startNotice() {
+        try {
+            long[] pattern = {800, 1500, 800, 1500};
+            vibrator.vibrate(pattern, 2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public  void stopNotice() {
+        try {
+            vibrator.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 }
