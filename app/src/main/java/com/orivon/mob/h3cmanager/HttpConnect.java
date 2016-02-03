@@ -68,6 +68,11 @@ public class HttpConnect {
         }
         client.newCall(request).enqueue(callback);
     }
+
+
+
+
+
     public void doGet(String url, IDataCallBack callback) {
         Request request;
             request = new Request.Builder()
@@ -129,17 +134,6 @@ public class HttpConnect {
 
 
 
-//        Accept-Encoding: gzip
-
-
-//        Accept: image/webp,image/*,*/*;q=0.8
-
-//        Accept-Encoding: gzip, deflate, sdch
-
-
-//        Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.6
-
-
     }
 
 
@@ -155,7 +149,7 @@ public class HttpConnect {
      * @param paramMap 参数表
      * @return 转换、编码后的结果
      */
-    private String mapToString(Map<String, String> paramMap) throws UnsupportedEncodingException {
+    public static String mapToString(Map<String, String> paramMap) throws UnsupportedEncodingException {
         String res = "";
         if (paramMap != null && !paramMap.isEmpty()) {
             for (String key : paramMap.keySet()) {
@@ -163,6 +157,18 @@ public class HttpConnect {
             }
             res = res.substring(0, res.length() - 1);
         }
+        return res;
+    }
+    public static String mapTooString(Map<String, String> paramMap) throws UnsupportedEncodingException{
+        String res = "";
+        if (paramMap != null && !paramMap.isEmpty()) {
+            for (String key : paramMap.keySet()) {
+                res = res + "queueIds" + "=" + key + "&";
+            }
+            res = res.substring(0, res.length() - 1);
+        }
+
+        System.out.println("finish");
         return res;
     }
 

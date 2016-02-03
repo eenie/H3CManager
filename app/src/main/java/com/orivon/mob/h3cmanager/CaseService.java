@@ -17,8 +17,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,8 +34,7 @@ public class CaseService extends Service {
 
     final String assCaseURL = "http://newcms.h3c.com/hpcms/case/caseList?type=Assigned%20Cases";
 
-    String caseURL = "http://newcms.h3c.com/hpcms/case/queueCaseList?column=&sort=&selectAllCheckBox=on&queueIds=a552af6e5c214996970713b448dd3cb4&queueIds=c368478d38ac4e5aafb709bcc3ea87b1&queueIds=3286d93e2e1a43b68e135c7a1aff3ceb&queueIds=911e08605d564655bf2b69e7af3db71b&queueIds=d0645ed9b1424a3cbb73286b6d2b4296&queueIds=94571150ce1041d09ebd76923c9f8ee2&queueIds=61a51ccd069348d3b653bb319c103960";
-
+    String caseURL = "http://newcms.h3c.com/hpcms/case/queueCaseList?column=&sort=&selectAllCheckBox=on";
     H3CApplication application;
     HttpConnect http;
     Handler handler;
@@ -44,6 +46,8 @@ public class CaseService extends Service {
 
     int caseCount = 0;
     int lastCount = 0;
+
+    Map<String, String> parse = new HashMap<>();
 
     CaseRunnable caseRunnable;
 
@@ -83,31 +87,36 @@ public class CaseService extends Service {
         @Override
         public void run() {
 
-            http.doGet(caseURL, builder.build(),
-                    new DataCallBack() {
-                        @Override
-                        public void onStart() {
 
-                        }
+            try {
+                http.doGet(caseURL+HttpConnect.mapTooString(parse), builder.build(),
+                        new DataCallBack() {
+                            @Override
+                            public void onStart() {
 
-                        @Override
-                        public void onFailure(int code) {
+                            }
 
-                        }
+                            @Override
+                            public void onFailure(int code) {
+
+                            }
 
 
-                        @Override
-                        public void onSuccessful(String response) {
-                            parseHtml(response);
-                            handler.postDelayed(caseRunnable, time);
-                        }
+                            @Override
+                            public void onSuccessful(String response) {
+                                parseHtml(response);
+                                handler.postDelayed(caseRunnable, time);
+                            }
 
-                        @Override
-                        public void onFinish() {
+                            @Override
+                            public void onFinish() {
 
-                        }
+                            }
 
-                    });
+                        });
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
 
         }
@@ -141,6 +150,7 @@ public class CaseService extends Service {
         Elements countElements = document.getElementsByClass("blue");
         builder.setRecordCount(countElements.get(0).text().trim());
         builder.setPagerCount(countElements.get(2).text().trim());
+        //解析case list
         for (int i = 0; i < comElements.size(); i++) {
             Elements infos = comElements.get(i).getElementsByTag("td");
             builder.setID(Integer.parseInt(infos.get(0).text()))
@@ -175,6 +185,17 @@ public class CaseService extends Service {
             });
             myQueuesBeans.add(myQueuesBean);
         }
+
+
+
+        Elements e = document.getElementsByClass("queues");
+        Elements es = e.get(0).getElementsByAttribute("value");
+        Elements esTitle = e.get(0).getElementsByTag("li");
+        for (int i = 0; i < es.size(); i++) {
+            parse.put(es.get(i).attributes().get("value"), esTitle.get(i + 1).text());
+        }
+
+
         return myQueuesBeans;
     }
 

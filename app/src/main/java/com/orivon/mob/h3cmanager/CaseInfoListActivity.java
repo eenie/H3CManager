@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +31,11 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CaseInfoListActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,10 +50,13 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
     Button btnPrev, btnNext;
 
     H3CApplication application;
-    String caseURL = "http://newcms.h3c.com/hpcms/case/queueCaseList?column=&sort=&selectAllCheckBox=on&queueIds=a552af6e5c214996970713b448dd3cb4&queueIds=c368478d38ac4e5aafb709bcc3ea87b1&queueIds=3286d93e2e1a43b68e135c7a1aff3ceb&queueIds=911e08605d564655bf2b69e7af3db71b&queueIds=d0645ed9b1424a3cbb73286b6d2b4296&queueIds=94571150ce1041d09ebd76923c9f8ee2&queueIds=61a51ccd069348d3b653bb319c103960";
+    String caseURL = "http://newcms.h3c.com/hpcms/case/queueCaseList?column=&sort=&selectAllCheckBox=on";
 
     String h3cCookie;
     HttpConnect http = new HttpConnect();
+
+
+    Map<String, String> parse = new HashMap<>();
 
 
     BroadcastReceiver caseReceiver=new BroadcastReceiver() {
@@ -162,7 +169,7 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
                 finish();
                 break;
             case R.id.imgSet:
-
+                showDialog();
                 break;
             case R.id.btnPrev:
 
@@ -299,6 +306,16 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
 //            application.save(myQueuesBean);
             myQueuesBeans.add(myQueuesBean);
         }
+
+
+        Elements e = document.getElementsByClass("queues");
+        Elements es = e.get(0).getElementsByAttribute("value");
+        Elements esTitle = e.get(0).getElementsByTag("li");
+        for (int i = 0; i < es.size(); i++) {
+            parse.put(es.get(i).attributes().get("value"), esTitle.get(i + 1).text());
+        }
+
+
         return myQueuesBeans;
     }
 
@@ -307,38 +324,45 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         Headers.Builder builder = new Headers.Builder();
         builder.add("Cookie", Cookie);
 
-        http.doGet(url, builder.build(), new DataCallBack() {
-            @Override
-            public void onStart() {
+        try {
 
-            }
+            System.out.println(url+HttpConnect.mapTooString(parse));
 
-            @Override
-            public void onFailure(int code) {
+            http.doGet(url+HttpConnect.mapTooString(parse), builder.build(), new DataCallBack() {
+                @Override
+                public void onStart() {
 
-            }
-
-            @Override
-            public void onSuccessful(String response) {
-
-
-                queuesBeans = parseHtml(response);
-
-
-                if (queuesBeans.size() > 0) {
-                    textNum.setText(queuesBeans.get(0).getRecordCount());
-                    textCount.setText("1/" + queuesBeans.get(0).getPagerCount());
                 }
-                caseInfoList.refreshCompleted();
-                caseAdapter.notifyDataSetChanged();
 
-            }
+                @Override
+                public void onFailure(int code) {
 
-            @Override
-            public void onFinish() {
+                }
 
-            }
-        });
+                @Override
+                public void onSuccessful(String response) {
+
+
+                    queuesBeans = parseHtml(response);
+
+
+                    if (queuesBeans.size() > 0) {
+                        textNum.setText(queuesBeans.get(0).getRecordCount());
+                        textCount.setText("1/" + queuesBeans.get(0).getPagerCount());
+                    }
+                    caseInfoList.refreshCompleted();
+                    caseAdapter.notifyDataSetChanged();
+
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
+            });
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -348,4 +372,33 @@ public class CaseInfoListActivity extends AppCompatActivity implements View.OnCl
         super.onResume();
         CaseService.stopNotice();
     }
+
+
+
+
+    public void showDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("筛选")
+                .setMultiChoiceItems(mapToStringArry(parse),null, null);
+
+        builder.create().show();
+    }
+
+
+
+
+    public String[] mapToStringArry(Map<String,String> map) {
+
+        String[] strings = new String[map.size()];
+
+        for (int i = 0; i < map.size(); i++) {
+
+
+            strings[i] = (String) parse.values().toArray()[i];
+        }
+
+        return strings;
+    }
+
 }
